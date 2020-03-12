@@ -20,6 +20,7 @@
 #include "log.h"
 
 #include "channeloutput/serialutil.h"
+#include "fppversion_defines.h"
 
 
 enum {
@@ -85,7 +86,11 @@ public:
         return total;
     }
     
+#if FPP_MAJOR_VERSION >= 4
+    virtual const std::shared_ptr<httpserver::http_response> render_POST(const httpserver::http_request &req) override {
+#else
     virtual const httpserver::http_response render_POST(const httpserver::http_request &req) override {
+#endif
         printf("In render_POST\n");
         
         std::string MA = req.get_arg("MA");
@@ -151,7 +156,11 @@ public:
             Init();
         }
         
+#if FPP_MAJOR_VERSION >= 4
+        return std::shared_ptr<httpserver::http_response>(new httpserver::string_response("OK", 200));
+#else
         return httpserver::http_response_builder("OK", 200);
+#endif
     }
     
 
