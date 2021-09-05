@@ -3,9 +3,9 @@
 	"name": "LoRa MultiSync Plugin for FPP",
 	"author": "Daniel Kulp (dkulp)",
 	"description": "This plugin extends the Master/Remote protocol of FPP to use LoRa serial/uart devices.  This can provide Master/Remote setups that span miles, far outside the range of Wifi.",
-	"homeURL": "https://github.com/FalconChristmas/fpp-LoRa",
-	"srcURL": "https://github.com/FalconChristmas/fpp-LoRa.git",
-	"bugURL": "https://github.com/FalconChristmas/fpp-LoRa/issues",
+	"homeURL": "https://github.com/leelindquist/fpp-LoRa",
+	"srcURL": "https://github.com/leelindquist/fpp-LoRa.git",
+	"bugURL": "https://github.com/leelindquist/fpp-LoRa/issues",
 	"allowUpdates": 1,
 	"versions": [
 		{
