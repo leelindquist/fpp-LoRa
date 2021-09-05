@@ -15,6 +15,7 @@
 #include "MultiSync.h"
 #include "Plugin.h"
 #include "Plugins.h"
+#include "events.h"
 #include "Sequence.h"
 #include "log.h"
 
@@ -32,6 +33,7 @@ enum {
     STOP_MEDIA        = 6,
     SYNC              = 7,
     
+    EVENT             = 8,
     BLANK             = 9
 };
 
@@ -299,6 +301,12 @@ public:
         }
     }
     
+    virtual void SendEventPacket(const std::string &eventID) {
+        char buf[256];
+        strcpy(&buf[1], eventID.c_str());
+        buf[0] = EVENT;
+        send(buf, eventID.length() + 2);
+    }
     virtual void SendBlankingDataPacket(void) {
         char buf[2];
         buf[0] = BLANK;
@@ -312,6 +320,7 @@ public:
         switch (readBuffer[0]) {
         case SET_SEQUENCE_NAME:
         case SET_MEDIA_NAME:
+        case EVENT:
             //need null terminated string
             for (commandSize = 0; commandSize < curPosition; commandSize++) {
                 if (readBuffer[commandSize] == 0) {
@@ -429,6 +438,13 @@ public:
                                 multiSync->SendBlankingDataPacket();
                             }
                             break;
+                        case EVENT:
+                            PluginManager::INSTANCE.eventCallback(&readBuffer[1], "remote");
+                            TriggerEventByID(&readBuffer[1]);
+                            if (bridgeToLocal) {
+                                multiSync->SendEventPacket(&readBuffer[1]);
+                            }
+                            break;
                         default:
                             LogWarn(VB_SYNC, "Unknown command   cmd: %d    (%d bytes)\n", readBuffer[0], curPosition);
                             break;
@@ -508,7 +524,7 @@ public:
     void registerApis(httpserver::webserver *m_ws) {
         //at this point, most of FPP is up and running, we can register our MultiSync plugin
         if (enabled && plugin->Init()) {
-            if (getFPPmode() == PLAYER_MODE) {
+            if (getFPPmode() == MASTER_MODE) {
                 //only register the sender for master mode
                 multiSync->addMultiSyncPlugin(plugin);
             }
